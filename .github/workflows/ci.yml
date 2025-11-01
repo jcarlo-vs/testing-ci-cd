@@ -77,7 +77,20 @@ jobs:
         # This reads package.json and installs to node_modules
 
       # ========================================
-      # STEP 4: Check if App Starts
+      # STEP 4: Run Linter (ESLint)
+      # ========================================
+      # COMMAND: Checks code quality and style
+      # ESLint analyzes your code for potential errors and style issues
+      - name: Run linter
+        run: npm run lint
+        # This checks all .js files for:
+        # - Syntax errors
+        # - Code style violations
+        # - Potential bugs
+        # - Best practice violations
+
+      # ========================================
+      # STEP 5: Check if App Starts
       # ========================================
       # COMMAND: Tests if the app can start without errors
       - name: Check if app starts
@@ -99,8 +112,9 @@ jobs:
 # 3. Runs each step in order:
 #    a. Downloads your code
 #    b. Installs Node.js 20
-#    c. Installs npm packages
-#    d. Tries to start your app
+#    c. Installs npm packages (including ESLint)
+#    d. Runs ESLint to check code quality
+#    e. Tries to start your app
 # 4. If all steps pass → ✅ Success (green checkmark)
 # 5. If any step fails → ❌ Failure (red X)
 # ============================================
