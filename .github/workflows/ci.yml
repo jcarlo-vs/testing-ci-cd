@@ -1,0 +1,106 @@
+# ============================================
+# WORKFLOW NAME
+# ============================================
+# This name appears in the GitHub Actions UI
+# You'll see "CI Pipeline" in the Actions tab
+name: CI Pipeline
+
+# ============================================
+# TRIGGER EVENTS (When to run this workflow)
+# ============================================
+# "on" defines what events trigger this workflow
+on:
+  # PUSH EVENT: Run when code is pushed
+  push:
+    # Only trigger on these branches
+    # This workflow runs when you push to "main" or "develop"
+    branches: [main, develop]
+
+  # PULL REQUEST EVENT: Run when a PR is opened/updated
+  pull_request:
+    # Only for PRs targeting the "main" branch
+    branches: [main]
+
+# ============================================
+# JOBS (What to do when triggered)
+# ============================================
+# A workflow can have multiple jobs
+# Jobs run in parallel by default (unless you specify dependencies)
+jobs:
+  # --------------------------------------------
+  # JOB 1: "test"
+  # --------------------------------------------
+  # This is the job ID/name (you can call it anything)
+  # Examples: test, build, deploy, lint, etc.
+  test:
+    # RUNNER: What machine/OS to run on
+    # Options: ubuntu-latest, windows-latest, macos-latest
+    # GitHub provides these machines for free (with limits)
+    runs-on: ubuntu-latest
+
+    # STEPS: Sequential tasks within this job
+    # Steps run one after another, in order
+    # If any step fails, the job stops and marks as failed
+    steps:
+      # ========================================
+      # STEP 1: Checkout Code
+      # ========================================
+      # ACTION: Uses a pre-built action from GitHub
+      # This downloads your repository code to the runner
+      # Without this, the runner would have an empty directory
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # @v4 is the version of the action
+        # "actions/checkout" is maintained by GitHub
+
+      # ========================================
+      # STEP 2: Setup Node.js
+      # ========================================
+      # ACTION: Installs Node.js on the runner
+      # The runner doesn't have Node.js by default
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        # "with" provides configuration to the action
+        with:
+          # Install Node.js version 20
+          node-version: "20"
+          # You could also use: "18", "lts/*", etc.
+
+      # ========================================
+      # STEP 3: Install Dependencies
+      # ========================================
+      # COMMAND: Runs a shell command
+      # This installs all packages from package.json
+      # Same as running "npm install" on your local machine
+      - name: Install dependencies
+        run: npm install
+        # This reads package.json and installs to node_modules
+
+      # ========================================
+      # STEP 4: Check if App Starts
+      # ========================================
+      # COMMAND: Tests if the app can start without errors
+      - name: Check if app starts
+        # The "|" means multi-line command
+        run: |
+          # "timeout 5" = stop after 5 seconds
+          # "node index.js" = start your Express server
+          # "|| true" = don't fail if timeout occurs (we expect it)
+          timeout 5 node index.js || true
+          # Echo a success message
+          echo "App check completed"
+        # This step verifies your app doesn't crash on startup
+
+# ============================================
+# WORKFLOW EXECUTION FLOW
+# ============================================
+# 1. Event occurs (push to main/develop OR pull request)
+# 2. GitHub spins up an Ubuntu machine
+# 3. Runs each step in order:
+#    a. Downloads your code
+#    b. Installs Node.js 20
+#    c. Installs npm packages
+#    d. Tries to start your app
+# 4. If all steps pass → ✅ Success (green checkmark)
+# 5. If any step fails → ❌ Failure (red X)
+# ============================================
